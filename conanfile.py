@@ -64,12 +64,14 @@ class A52decConan(ConanFile):
         if self.settings.os == 'Windows':
             platforms = {'x86': 'Win32', 'x86_64': 'x64'}
             output_rpath = os.path.join("vc++",platforms.get(str(self.settings.arch)),str(self.settings.build_type))
-            self.copy("liba52.*", dst=os.path.join(self.package_folder,"lib"),
-                     src=os.path.join(self.build_folder,self._source_subfolder,output_rpath), excludes=["liba52.dll","liba52.tlog"])
             self.copy("liba52.dll", dst=os.path.join(self.package_folder,"bin"),
                       src=os.path.join(self.build_folder,self._source_subfolder,output_rpath))
             self.copy("a52dec.exe", dst=os.path.join(self.package_folder,"bin"),
                       src=os.path.join(self.build_folder,self._source_subfolder,"vc++","Debug"))
+            tools.mkdir(os.path.join(self.package_folder,"lib"))
+            for suffix in [".lib",".exp",".ilk",".pdb"]:
+                shutil.copy(os.path.join(self.build_folder,self._source_subfolder,output_rpath,"liba52"+suffix),
+                            os.path.join(self.package_folder,"lib","a52"+suffix))
         #if tools.os_info.is_linux:
         #    with tools.chdir(self.source_subfolder):
         #        self.copy("*", src="%s/builddir"%(os.getcwd()))
